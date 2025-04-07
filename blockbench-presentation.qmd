@@ -1,0 +1,235 @@
+---
+title: "BLOCKBENCH: A Framework for Analyzing Private Blockchains"
+subtitle: "Research Paper Presentation"
+author: "Cesaire Tobias"
+date: "April 7, 2025"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    self-contained: true
+    embed-resources: true
+    touch: true
+    controls: true
+    slide-number: c/t
+    footer: "Financial Software Engineering (ECO5040S) - Assignment 1"
+    code-copy: true
+    center-title-slide: true
+    code-link: true
+    code-overflow: wrap
+    highlight-style: a11y
+    height: 1080
+    width: 1920
+    template-partials:
+      - title-slide.html
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+---
+
+## Overview
+
+::: incremental
+- **Problem**: Lack of systematic evaluation framework for blockchains
+- **Solution**: BLOCKBENCH - first benchmarking framework for permissioned blockchains
+- **Focus**: Private blockchains (Hyperledger, Ethereum, Parity)
+- **Goal**: Analyze performance bottlenecks in blockchain systems
+:::
+
+## Why Private Blockchains?
+
+::: {.custom-box}
+Private blockchains: distributed ledger systems with known, authorized participants
+:::
+
+::: incremental
+- **Enterprise Use**: Supply chain, healthcare, finance
+- **Benefits**: Higher throughput, lower latency than public chains
+- **Control**: Network management, governance, data privacy
+- **Scalability**: Better suited for high-transaction enterprise systems
+:::
+
+## BLOCKBENCH Framework
+
+::: columns
+::: {.column width="50%"}
+**Design Goals:**
+- Extensible
+- Fair comparison
+- Comprehensive metrics
+- Realistic workloads
+:::
+
+::: {.column width="50%"}
+**Evaluation Layers:**
+- Consensus Layer
+- Data Model
+- Execution Engine
+:::
+:::
+
+## Blockchain Platforms Analyzed
+
+::: incremental
+- **Hyperledger Fabric v0.6**: Practical Byzantine Fault Tolerance
+- **Ethereum**: Proof of Work consensus
+- **Parity**: Proof of Authority (variant of Ethereum)
+:::
+
+## Evaluation Methodology {.smaller}
+
+Four categories of workloads to stress different layers:
+
+| Workload | Layer | Description |
+|----------|-------|-------------|
+| YCSB | Data model | Key-value operations |
+| Smallbank | Execution | Banking transactions |
+| EtherId | Application | Domain name service |
+| DoNothing | Consensus | Empty smart contracts |
+
+## Performance Metrics
+
+::: incremental
+- **Throughput**: Transactions per second
+- **Latency**: Time to confirmation
+- **Scalability**: Performance with increasing nodes
+- **Fault Tolerance**: System behavior during failures
+:::
+
+## Key Findings {.smaller}
+
+::: incremental
+- All platforms **significantly underperform** vs centralized databases
+- **Hyperledger**: Better performance but unstable under high loads
+- **Ethereum/Parity**: More robust but lower throughput
+- **Consensus protocols** are major bottleneck
+- **Execution engine** efficiency affects smart contract performance
+- Platforms not **optimized for database operations**
+:::
+
+## Performance Results
+
+```{r, echo=FALSE, out.width="80%", fig.align="center"}
+# Create performance-chart.png using ggplot
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+# Create sample data based on BLOCKBENCH paper findings
+blockchain_data <- data.frame(
+  Platform = rep(c("Hyperledger", "Ethereum", "Parity"), 2),
+  Metric = c(rep("Throughput (tx/s)", 3), rep("Latency (ms)", 3)),
+  Value = c(1200, 400, 550, 1500, 3000, 2500)
+)
+
+# Reorder platforms
+blockchain_data$Platform <- factor(blockchain_data$Platform, 
+                                  levels = c("Hyperledger", "Ethereum", "Parity"))
+
+# Create throughput chart
+throughput_data <- blockchain_data %>% filter(Metric == "Throughput (tx/s)")
+throughput_chart <- ggplot(throughput_data, aes(x = Platform, y = Value, fill = Platform)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
+  labs(title = "Transaction Throughput Comparison",
+       y = "Transactions per second", 
+       x = "") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank(),
+    panel.border = element_rect(color = "grey80", fill = NA)
+  )
+
+# Create latency chart
+latency_data <- blockchain_data %>% filter(Metric == "Latency (ms)")
+latency_chart <- ggplot(latency_data, aes(x = Platform, y = Value, fill = Platform)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
+  labs(title = "Transaction Latency Comparison",
+       y = "Latency (milliseconds)", 
+       x = "") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank(),
+    panel.border = element_rect(color = "grey80", fill = NA)
+  )
+
+# Combined chart with two metrics
+combined_chart <- ggplot(blockchain_data, aes(x = Platform, y = Value, fill = Platform)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
+  labs(title = "Blockchain Performance Comparison",
+       y = "Value", 
+       x = "") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    strip.background = element_rect(fill = "#f0f0f0")
+  )
+
+# Save the plots
+ggsave("throughput-chart.png", throughput_chart, width = 8, height = 5)
+ggsave("latency-chart.png", latency_chart, width = 8, height = 5)
+ggsave("performance-chart.png", combined_chart, width = 10, height = 6)
+
+knitr::include_graphics("performance-chart.png")
+
+```
+
+## Bottlenecks Identified
+
+::: incremental
+- **Consensus Layer**: Limited throughput, high latency
+- **Data Model**: Inefficient data access patterns
+- **Execution Engine**: Interpreter overhead, limited optimization
+- **Networking**: Communication overhead between nodes
+:::
+
+## Lessons & Recommendations
+
+::: {.custom-box}
+Current blockchain platforms are still immature for enterprise usage
+:::
+
+::: incremental
+- Need more **optimized data models**
+- **Sharding** for improved scalability
+- Better **execution engines** for smart contracts
+- More efficient **consensus protocols**
+:::
+
+## Conclusions
+
+::: incremental
+- First systematic framework for evaluating private blockchains
+- Significant performance gaps compared to traditional databases
+- Major bottlenecks identified across all platforms
+- Roadmap for future blockchain optimization
+:::
+
+## References
+
+- Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017). BLOCKBENCH: A Framework for Analyzing Private Blockchains. Proceedings of the 2017 ACM International Conference on Management of Data.
+
+- [GitHub Repository](https://github.com/ooibc88/blockbench)
+
+## Thank You {.center}
+
+::: {style="text-align: center"}
+Questions?
+
+![](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://blockbench-presentation.onrender.com)
+
+Presentation available at: blockbench-presentation.onrender.com
+:::

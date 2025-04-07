@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<section id="title-slide">
+  <h1 class="title">$title$</h1>
+  $if(subtitle)$
+    <p class="subtitle">$subtitle$</p>
+  $endif$
+  $for(author)$
+    <p class="author">$author$</p>
+  $endfor$
+  $if(date)$
+    <p class="date">$date$</p>
+  $endif$
+
+  <!-- QR Code Container -->
+  <div class="qrcode-container">
+    <div id="qrcode"></div>
+  </div>
+
+  <script nonce="<%= nonce %>">
+  document.addEventListener("DOMContentLoaded", function() {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    script.onload = function() {
+      new QRCode(document.getElementById("qrcode"), {
+        text: "https://blockbench-presentation.onrender.com",
+        width: 200,
+        height: 200
+      });
+    };
+    document.head.appendChild(script);
+  });
+  </script>
+
+  <style nonce="<%= nonce %>">
+  .qrcode-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+    width: 100%;
+  }
+  #qrcode {
+    margin: 0 auto;
+  }
+  </style>
+</section>
