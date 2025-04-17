@@ -2,7 +2,7 @@
 title: "BLOCKBENCH: A Framework for Analyzing Private Blockchains"
 subtitle: "Research Paper Presentation"
 author: "Cesaire Tobias"
-date: "April 7, 2025"
+date: "2 May 2025"
 format:
   revealjs:
     theme: [default, custom.scss]
@@ -12,224 +12,780 @@ format:
     controls: true
     slide-number: c/t
     footer: "Financial Software Engineering (ECO5040S) - Assignment 1"
-    code-copy: true
     center-title-slide: true
-    code-link: true
-    code-overflow: wrap
     highlight-style: a11y
     height: 1080
     width: 1920
     template-partials:
       - title-slide.html
+    include-in-header:
+      - text: |
+          <script src="https://unpkg.com/mermaid@9/dist/mermaid.min.js"></script>
+          <script src="mermaid-interaction.js"></script>
+          <link rel="stylesheet" href="mermaid-styles.css">
+    auto-slide: false
 execute:
-  echo: true
+  echo: false
   eval: true
   freeze: auto
 ---
 
-## Overview
-
-::: incremental
-- **Problem**: Lack of systematic evaluation framework for blockchains
-- **Solution**: BLOCKBENCH - first benchmarking framework for permissioned blockchains
-- **Focus**: Private blockchains (Hyperledger, Ethereum, Parity)
-- **Goal**: Analyze performance bottlenecks in blockchain systems
+::: notes
+BLOCKBENCH - a framework developed by researchers from the National University of Singapore and Zhejiang University for analyzing private blockchain systems. Today we'll explore how this framework helps evaluate blockchain performance and what insights it provides for future development.
 :::
 
-## Why Private Blockchains?
+## Presentation Overview
 
-::: {.custom-box}
-Private blockchains: distributed ledger systems with known, authorized participants
+1. Introduction to Private Blockchains
+2. The Need for BLOCKBENCH
+3. Framework Architecture
+4. Benchmark Workloads
+5. Evaluation Methodology
+6. Performance Results
+7. Key Findings
+8. Implications for Industry
+9. Future Directions
+10. Conclusion
+
+::: notes
+We'll begin with a brief introduction to private blockchains, then explore why BLOCKBENCH was needed. We'll examine its architecture, benchmarking approach, and key findings before discussing implications for industries considering blockchain adoption.
 :::
 
-::: incremental
-- **Enterprise Use**: Supply chain, healthcare, finance
-- **Benefits**: Higher throughput, lower latency than public chains
-- **Control**: Network management, governance, data privacy
-- **Scalability**: Better suited for high-transaction enterprise systems
+---
+
+## Introduction to Private Blockchains
+
+[View Blockchain Types Diagram in Appendix](#blockchain-types)
+
+- **Private Blockchains**: Permissioned networks where participants are identified
+- **Target Applications**: Enterprise systems, consortium networks, supply chains
+- **Key Platforms**: 
+  - Ethereum
+  - Hyperledger Fabric
+  - Parity
+
+::: notes
+Unlike public blockchains like Bitcoin where anyone can participate, private blockchains operate in controlled environments with known participants. They're designed for enterprise applications like supply chain management, financial services, and healthcare records. The three platforms evaluated in the paper—Ethereum, Hyperledger Fabric, and Parity—represent different architectural approaches to private blockchain implementation.
 :::
 
-## BLOCKBENCH Framework
+---
 
-::: columns
-::: {.column width="50%"}
-**Design Goals:**
-- Extensible
-- Fair comparison
-- Comprehensive metrics
-- Realistic workloads
+## The Need for BLOCKBENCH
+
+[View Need for Standard Framework Diagram in Appendix](#need-for-standard-framework)
+
+- **Lack of Standard Evaluation Framework**
+- **Difficult to Compare Different Systems**
+- **Gap Between Industry Claims and Reality**
+- **No Baseline Comparison with Traditional Databases**
+
+::: notes
+Before BLOCKBENCH, there was no standardized way to evaluate and compare blockchain systems. Companies and organizations had to rely on vendor claims or conduct their own assessments, which were often inconsistent or incomplete. BLOCKBENCH fills this gap by providing a systematic framework that enables apples-to-apples comparisons not only between blockchain platforms but also against traditional database systems that blockchain might potentially replace.
 :::
 
-::: {.column width="50%"}
-**Evaluation Layers:**
-- Consensus Layer
-- Data Model
-- Execution Engine
-:::
-:::
+---
 
-## Blockchain Platforms Analyzed
+## Framework Architecture
 
-::: incremental
-- **Hyperledger Fabric v0.6**: Practical Byzantine Fault Tolerance
-- **Ethereum**: Proof of Work consensus
-- **Parity**: Proof of Authority (variant of Ethereum)
-:::
+[View BLOCKBENCH Framework Diagram in Appendix](#blockbench-framework)
 
-## Evaluation Methodology {.smaller}
+- **Layered Approach**:
+  - Consensus Layer
+  - Data Model Layer
+  - Execution Layer
+- **Benchmark Interface**
+- **Metrics Focus**: Throughput, Latency, Scalability, Fault Tolerance
 
-Four categories of workloads to stress different layers:
-
-| Workload | Layer | Description |
-|----------|-------|-------------|
-| YCSB | Data model | Key-value operations |
-| Smallbank | Execution | Banking transactions |
-| EtherId | Application | Domain name service |
-| DoNothing | Consensus | Empty smart contracts |
-
-## Performance Metrics
-
-::: incremental
-- **Throughput**: Transactions per second
-- **Latency**: Time to confirmation
-- **Scalability**: Performance with increasing nodes
-- **Fault Tolerance**: System behavior during failures
+::: notes
+BLOCKBENCH uses a layered approach to evaluate blockchain systems, focusing on three critical layers: consensus mechanisms for transaction agreement, data models for state management, and execution environments for smart contracts. This architecture allows for targeted benchmarking at each layer while also enabling holistic system evaluation. The framework collects key metrics like throughput (transactions per second), latency (time to confirmation), scalability (performance as network grows), and fault tolerance (resilience to node failures).
 :::
 
-## Key Findings {.smaller}
+---
 
-::: incremental
-- All platforms **significantly underperform** vs centralized databases
-- **Hyperledger**: Better performance but unstable under high loads
-- **Ethereum/Parity**: More robust but lower throughput
-- **Consensus protocols** are major bottleneck
-- **Execution engine** efficiency affects smart contract performance
-- Platforms not **optimized for database operations**
+## Benchmark Workloads
+
+[View Benchmark Workloads Diagram in Appendix](#benchmark-workloads-diagram)
+
+| Workload | Description | Tests |
+|----------|-------------|-------|
+| **YCSB** | Key-value operations | Read/write/scan operations |
+| **Smallbank** | Banking transactions | Account transfers, balance checks |
+| **EtherId** | Name registration | Complex state operations |
+| **Donothing** | Empty blocks | Consensus overhead |
+
+::: notes
+The researchers designed four workloads to stress different aspects of blockchain systems. YCSB (Yahoo! Cloud Serving Benchmark) tests basic data operations. Smallbank simulates banking transactions to evaluate consistency and isolation. EtherId tests complex smart contract operations through domain name registration scenarios. The Donothing benchmark isolates consensus overhead by processing empty blocks, revealing the baseline cost of the consensus protocol itself.
 :::
 
-## Performance Results
+---
 
-```{r, echo=FALSE, out.width="80%", fig.align="center"}
-# Create performance-chart.png using ggplot
-library(ggplot2)
-library(dplyr)
-library(forcats)
+## Evaluation Methodology
 
-# Create sample data based on BLOCKBENCH paper findings
-blockchain_data <- data.frame(
-  Platform = rep(c("Hyperledger", "Ethereum", "Parity"), 2),
-  Metric = c(rep("Throughput (tx/s)", 3), rep("Latency (ms)", 3)),
-  Value = c(1200, 400, 550, 1500, 3000, 2500)
+[View Evaluation Methodology Diagram in Appendix](#evaluation-methodology-diagram)
+
+- **Systems Under Test**:
+  - Ethereum (PoW)
+  - Hyperledger Fabric (PBFT)
+  - Parity (PoA)
+  - H-Store (traditional distributed database)
+- **Controlled Environment**: 48-node cluster
+- **Statistical Rigor**: Multiple runs, confidence intervals
+- **Parameter Optimization**: Each system configured optimally
+
+::: notes
+The evaluation was conducted on a 48-node cluster, allowing for tests with varying network sizes. Each system was configured for optimal performance before testing, ensuring fair comparison. The researchers employed statistical rigor by running each test multiple times with different random seeds and reporting results with confidence intervals. The inclusion of H-Store, a high-performance distributed database, provides a crucial baseline for understanding how blockchain systems compare to traditional technology.
+:::
+
+---
+
+## Performance Results: Throughput
+
+[View Throughput Comparison Chart in Appendix](#throughput-comparison)
+
+- **Blockchain vs Database**:
+  - H-Store: 10,000+ TPS
+  - Private Blockchains: 1,000-3,000 TPS peak
+- **Platform Comparison**:
+  - Ethereum: Moderate but consistent
+  - Hyperledger: Higher peaks, more variability
+  - Parity: Performance varies by workload
+
+::: notes
+The throughput results reveal a significant performance gap between blockchain systems and traditional databases. H-Store consistently achieved over 10,000 transactions per second, while the blockchain systems typically peaked between 1,000 and 3,000 TPS. Among the blockchain platforms, Hyperledger often showed higher peak throughput but with more variability. Ethereum demonstrated more consistent performance across workloads, while Parity's performance strongly depended on the workload type.
+:::
+
+---
+
+## Performance Results: Latency
+
+[View Latency Comparison Chart in Appendix](#latency-comparison)
+
+- **Transaction Confirmation Time**:
+  - H-Store: Milliseconds
+  - Ethereum: 3-10 seconds
+  - Hyperledger: 100-800 milliseconds
+  - Parity: 200-1000 milliseconds
+- **Consensus Protocol Impact**:
+  - PoW (Ethereum): Highest latency
+  - PBFT (Hyperledger): Lower but scaling issues
+  - PoA (Parity): Varies with validator count
+
+::: notes
+Latency results show even more dramatic differences. While traditional databases commit transactions in milliseconds, blockchain systems require hundreds of milliseconds to several seconds. Ethereum's Proof of Work consensus creates the highest latencies, typically 3-10 seconds. Hyperledger's PBFT offers faster confirmation times but shows rapidly increasing latency as the network grows. Parity's Proof of Authority falls between these approaches, with latency dependent on the number of validators.
+:::
+
+---
+
+## Performance Results: Scalability
+
+[View Scalability Analysis Chart in Appendix](#scalability-analysis)
+
+- **Negative Scalability**:
+  - Performance degrades as nodes increase
+  - 30-50% reduction when doubling nodes
+- **Consensus Bottlenecks**:
+  - PBFT: O(n²) message complexity
+  - PoW: Network propagation overhead
+- **Contrast with Databases**:
+  - H-Store: Near-linear scaling (positive)
+
+::: notes
+Perhaps the most concerning finding was the negative scalability exhibited by all blockchain systems. Rather than improving with additional nodes, performance typically degraded by 30-50% when doubling the network size. This contrasts sharply with distributed databases, which can scale positively. Hyperledger's PBFT consensus suffers from quadratic message complexity as nodes increase. Ethereum's PoW experiences increased block propagation times and higher orphan rates in larger networks. These scaling limitations represent a fundamental challenge for enterprise blockchain adoption.
+:::
+
+---
+
+## Layer-Specific Findings
+
+[View Layer Contribution Chart in Appendix](#layer-contribution)
+
+- **Consensus Layer**: 80-90% of total latency
+- **Data Model Layer**:
+  - Account-based (Ethereum): Better for read-heavy workloads
+  - UTXO-based (Hyperledger): Better for write-intensive applications
+- **Execution Layer**:
+  - 10-100x overhead compared to native execution
+  - Inefficient memory management
+  - Limited optimization capabilities
+
+::: notes
+The layered analysis reveals where performance bottlenecks occur. The consensus layer accounts for 80-90% of transaction latency in most scenarios. At the data model layer, Ethereum's account-based approach performs better for workloads with locality of reference, while Hyperledger's UTXO model excels in parallel execution scenarios. The execution layer shows massive inefficiencies, with smart contract execution typically adding 10-100 times the overhead compared to native code execution. This is due to interpreter-based virtual machines, inefficient memory management, and limited optimization capabilities.
+:::
+
+---
+
+## Key Findings and Implications
+
+[View Key Findings Diagram in Appendix](#key-findings)
+
+1. **Performance Gap**: Private blockchains significantly underperform databases
+2. **Negative Scalability**: Adding nodes decreases performance
+3. **Execution Inefficiency**: Smart contracts introduce major overhead
+4. **Consensus Dominance**: Protocol choice is the primary performance determinant
+5. **Data Model Impact**: Selection affects workload suitability
+
+::: notes
+The research produced five key findings with significant implications. First, there's a substantial performance gap between blockchain systems and traditional databases that must be addressed for enterprise adoption. Second, the negative scalability trend contradicts the distributed nature of blockchain and limits deployment scale. Third, smart contract execution efficiency needs dramatic improvement. Fourth, consensus protocol selection dominates overall system performance. Finally, data model selection should be based on specific workload characteristics rather than general preferences.
+:::
+
+---
+
+## Implications for Industry
+
+[View Industry Blockchain Readiness Chart in Appendix](#industry-readiness)
+
+| Industry | Requirements | Blockchain Readiness |
+|----------|--------------|---------------------|
+| **Financial Services** | High throughput, low latency | Limited - Hybrid solutions recommended |
+| **Supply Chain** | Scalability, moderate throughput | Moderate - Careful design needed |
+| **Healthcare** | Confidentiality, moderate latency | Promising - With optimization |
+| **Real Estate** | Security, lower throughput | Good fit - Current performance adequate |
+
+::: notes
+These findings have important implications for industries considering blockchain adoption. Financial services, with requirements for high throughput and low latency, may find current blockchain solutions inadequate for core transaction processing, suggesting hybrid architectures might be more appropriate. Supply chain applications need careful design to manage scalability limitations. Healthcare applications show promise but require optimization for sensitive data handling. Industries with lower throughput requirements like real estate may find current blockchain performance adequate.
+:::
+
+---
+
+## Conclusion
+
+[View Path Forward Diagram in Appendix](#path-forward)
+
+- **BLOCKBENCH Contribution**: First systematic framework for evaluation
+- **Current State**: Promising technology with significant limitations
+- **Path Forward**:
+  - Consensus protocol innovation
+  - Execution optimization
+  - Data model hybridization
+  - Architecture rethinking
+
+::: notes
+BLOCKBENCH represents a significant contribution to blockchain research by providing the first systematic evaluation framework. Its findings reveal that while private blockchain technology shows promise, current implementations have significant limitations that must be addressed before widespread enterprise adoption. Moving forward requires innovation in consensus protocols to improve scalability, optimization of execution environments, hybridization of data models, and potentially fundamental rethinking of blockchain architecture to overcome current limitations.
+:::
+
+---
+
+## Thank You
+### Questions?
+
+::: notes
+Thank you for your attention. I'm happy to answer any questions about the BLOCKBENCH framework, its findings, or implications for blockchain technology adoption.
+:::
+
+---
+
+# Appendix {.appendix}
+
+The following slides contain supplementary information including charts, diagrams, definitions, references, and more detailed results from the paper.
+
+[Return to Presentation Overview](#presentation-overview)
+
+## BLOCKBENCH Paper
+
+<iframe src="https://www.comp.nus.edu.sg/~ooibc/blockbench.pdf" width="100%" height="800px"></iframe>
+[View BLOCKBENCH Paper](https://www.comp.nus.edu.sg/~ooibc/blockbench.pdf){target="_blank"}
+
+::: notes
+This is the original BLOCKBENCH paper published by researchers from the National University of Singapore and Zhejiang University. The full citation is: Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017, May). BLOCKBENCH: A framework for analyzing private blockchains. In Proceedings of the 2017 ACM International Conference on Management of Data (pp. 1085-1100).
+:::
+
+---
+
+## Charts and Diagrams {.appendix}
+
+### Blockchain Types {#blockchain-types}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    classDef mainNode fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef publicNode fill:#d1f0ff,stroke:#0077b6,stroke-width:2px;
+    classDef privateNode fill:#ffedd8,stroke:#e67700,stroke-width:2px;
+    
+    A[Blockchain Types] --> B[Public Blockchain]
+    A --> C[Private Blockchain]
+    B --> B1[Open Access: Anyone can join]
+    B --> B2[Examples: Bitcoin, Ethereum]
+    B --> B3[High Decentralization]
+    C --> C1[Permissioned: Known participants]
+    C --> C2[Examples: Hyperledger, Parity]
+    C --> C3[Enterprise Use: Supply chain, finance]
+    
+    class A mainNode;
+    class B,B1,B2,B3 publicNode;
+    class C,C1,C2,C3 privateNode;
+```
+<p class="mermaid-caption">Figure A1: Types of blockchain systems and their characteristics</p>
+</div>
+
+<a href="#introduction-to-private-blockchains" class="appendix-link">Return to Introduction to Private Blockchains</a>
+
+---
+
+### Need for Standard Framework {#need-for-standard-framework}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme: 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    classDef mainNode fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef problemNode fill:#ffd6d6,stroke:#c81d25,stroke-width:2px;
+    classDef solutionNode fill:#d1f5d3,stroke:#2b9348,stroke-width:2px;
+    
+    A[Blockchain Systems] --> B[Vendor Claims]
+    A --> C[Custom Evaluations]
+    B --> D[Inconsistent Metrics]
+    C --> D
+    D --> E[No Standard Framework]
+    E --> F[Need for BLOCKBENCH]
+    
+    class A mainNode;
+    class B,C,D,E problemNode;
+    class F solutionNode;
+```
+<p class="mermaid-caption">Figure A2: Problem space that motivated the development of BLOCKBENCH</p>
+</div>
+
+<a href="#the-need-for-blockbench" class="appendix-link">Return to The Need for BLOCKBENCH</a>
+
+---
+
+### BLOCKBENCH Framework {#blockbench-framework}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    classDef mainNode fill:#f5f5f5,stroke:#333,stroke-width:2px;
+    classDef layerNode fill:#d1e7ff,stroke:#0077b6,stroke-width:2px;
+    classDef sublayerNode fill:#e6f3ff,stroke:#4da6ff,stroke-width:2px;
+    classDef interfaceNode fill:#ffdbb5,stroke:#fc7a08,stroke-width:2px;
+    classDef metricsNode fill:#ffe8b5,stroke:#fcba08,stroke-width:2px;
+    
+    A[BLOCKBENCH Framework] --> B[Consensus Layer]
+    A --> C[Data Model Layer]
+    A --> D[Execution Layer]
+    B --> B1[Transaction Agreement]
+    C --> C1[State Management]
+    D --> D1[Smart Contract Execution]
+    A --> E[Benchmark Interface]
+    E --> F[Metrics: Throughput, Latency, Scalability, Fault Tolerance]
+    
+    class A mainNode;
+    class B,C,D layerNode;
+    class B1,C1,D1 sublayerNode;
+    class E interfaceNode;
+    class F metricsNode;
+```
+<p class="mermaid-caption">Figure A3: Architecture of the BLOCKBENCH evaluation framework</p>
+</div>
+
+<a href="#framework-architecture" class="appendix-link">Return to Framework Architecture</a>
+
+---
+
+### Benchmark Workloads Diagram {#benchmark-workloads-diagram}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    classDef mainNode fill:#f5f5f5,stroke:#333,stroke-width:2px;
+    classDef workloadNode fill:#daffb3,stroke:#459a30,stroke-width:2px;
+    classDef detailNode fill:#f0ffdc,stroke:#6cbc49,stroke-width:2px;
+    
+    A[Workloads] --> B[YCSB]
+    A --> C[Smallbank]
+    A --> D[EtherId]
+    A --> E[Donothing]
+    B --> B1[Key-value operations]
+    C --> C1[Banking transactions]
+    D --> D1[Name registration]
+    E --> E1[Empty blocks]
+    
+    class A mainNode;
+    class B,C,D,E workloadNode;
+    class B1,C1,D1,E1 detailNode;
+```
+<p class="mermaid-caption">Figure A4: Four benchmark workloads used in BLOCKBENCH evaluation</p>
+</div>
+
+<a href="#benchmark-workloads" class="appendix-link">Return to Benchmark Workloads</a>
+
+---
+
+### Evaluation Methodology Diagram {#evaluation-methodology-diagram}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph LR
+    classDef stepNode fill:#e6f7ff,stroke:#0077b6,stroke-width:2px;
+    
+    A[Setup] --> B[Systems: Ethereum, Hyperledger, Parity, H-Store]
+    B --> C[48-node Cluster]
+    C --> D[Optimize Parameters]
+    D --> E[Run Benchmarks]
+    E --> F[Collect Metrics]
+    F --> G[Statistical Analysis]
+    
+    class A,B,C,D,E,F,G stepNode;
+```
+<p class="mermaid-caption">Figure A5: Evaluation methodology workflow</p>
+</div>
+
+<a href="#evaluation-methodology" class="appendix-link">Return to Evaluation Methodology</a>
+
+---
+
+### Throughput Comparison {#throughput-comparison}
+
+```{python}
+import plotly.graph_objects as go
+fig = go.Figure(data=[
+    go.Bar(name='Throughput (TPS)', x=['H-Store', 'Ethereum', 'Hyperledger', 'Parity'],
+           y=[10000, 2000, 3000, 2500],
+           marker_color=['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'])
+])
+fig.update_layout(
+    title={
+        'text': 'Throughput Comparison',
+        'font': {'size': 24}
+    },
+    xaxis_title={'text': 'System', 'font': {'size': 20}},
+    yaxis_title={'text': 'Transactions per Second', 'font': {'size': 20}},
+    font={'size': 18},
+    height=600,
+    margin=dict(t=80, b=80, l=80, r=40),
+    plot_bgcolor='rgba(240, 240, 240, 0.8)'
 )
-
-# Reorder platforms
-blockchain_data$Platform <- factor(blockchain_data$Platform, 
-                                  levels = c("Hyperledger", "Ethereum", "Parity"))
-
-# Create throughput chart
-throughput_data <- blockchain_data %>% filter(Metric == "Throughput (tx/s)")
-throughput_chart <- ggplot(throughput_data, aes(x = Platform, y = Value, fill = Platform)) +
-  geom_bar(stat = "identity", width = 0.6) +
-  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
-  labs(title = "Transaction Throughput Comparison",
-       y = "Transactions per second", 
-       x = "") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 16),
-    axis.title = element_text(size = 12),
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank(),
-    panel.border = element_rect(color = "grey80", fill = NA)
-  )
-
-# Create latency chart
-latency_data <- blockchain_data %>% filter(Metric == "Latency (ms)")
-latency_chart <- ggplot(latency_data, aes(x = Platform, y = Value, fill = Platform)) +
-  geom_bar(stat = "identity", width = 0.6) +
-  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
-  labs(title = "Transaction Latency Comparison",
-       y = "Latency (milliseconds)", 
-       x = "") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 16),
-    axis.title = element_text(size = 12),
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank(),
-    panel.border = element_rect(color = "grey80", fill = NA)
-  )
-
-# Combined chart with two metrics
-combined_chart <- ggplot(blockchain_data, aes(x = Platform, y = Value, fill = Platform)) +
-  geom_bar(stat = "identity", width = 0.6) +
-  facet_wrap(~ Metric, scales = "free_y") +
-  scale_fill_manual(values = c("#3366CC", "#DC3912", "#FF9900")) +
-  labs(title = "Blockchain Performance Comparison",
-       y = "Value", 
-       x = "") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 16),
-    axis.title = element_text(size = 12),
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank(),
-    strip.text = element_text(face = "bold"),
-    strip.background = element_rect(fill = "#f0f0f0")
-  )
-
-# Save the plots
-ggsave("throughput-chart.png", throughput_chart, width = 8, height = 5)
-ggsave("latency-chart.png", latency_chart, width = 8, height = 5)
-ggsave("performance-chart.png", combined_chart, width = 10, height = 6)
-
-knitr::include_graphics("performance-chart.png")
-
+fig.update_yaxes(gridcolor='rgba(200, 200, 200, 0.2)')
+fig.write_html('throughput.html')
+fig.show()
 ```
 
-## Bottlenecks Identified
+<a href="#performance-results-throughput" class="appendix-link">Return to Performance Results: Throughput</a>
 
-::: incremental
-- **Consensus Layer**: Limited throughput, high latency
-- **Data Model**: Inefficient data access patterns
-- **Execution Engine**: Interpreter overhead, limited optimization
-- **Networking**: Communication overhead between nodes
+---
+
+### Latency Comparison {#latency-comparison}
+
+```{python}
+import plotly.graph_objects as go
+import numpy as np
+
+# Use log scale for better visualization given the large range
+fig = go.Figure(data=[
+    go.Bar(name='Latency (ms)', 
+           x=['H-Store', 'Ethereum', 'Hyperledger', 'Parity'],
+           y=[1, 6000, 450, 600],
+           marker_color=['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3'],
+           text=[f"{y} ms" for y in [1, 6000, 450, 600]],
+           textposition='auto')
+])
+
+fig.update_layout(
+    title={
+        'text': 'Latency Comparison (Log Scale)',
+        'font': {'size': 24}
+    },
+    xaxis_title={'text': 'System', 'font': {'size': 20}},
+    yaxis_title={'text': 'Latency (ms)', 'font': {'size': 20}},
+    yaxis_type="log",
+    font={'size': 18},
+    height=600,
+    margin=dict(t=80, b=80, l=80, r=40),
+    plot_bgcolor='rgba(240, 240, 240, 0.8)'
+)
+fig.update_yaxes(gridcolor='rgba(200, 200, 200, 0.2)')
+fig.write_html('latency.html')
+fig.show()
+```
+
+<a href="#performance-results-latency" class="appendix-link">Return to Performance Results: Latency</a>
+
+---
+
+### Scalability Analysis {#scalability-analysis}
+
+```{python}
+#| label: fig-scalability-analysis
+import plotly.graph_objects as go
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=[8, 16, 32], y=[3000, 2000, 1100], mode='lines+markers', name='Ethereum'))
+fig.add_trace(go.Scatter(x=[8, 16, 32], y=[3500, 2300, 1200], mode='lines+markers', name='Hyperledger'))
+fig.add_trace(go.Scatter(x=[8, 16, 32], y=[3200, 2100, 1150], mode='lines+markers', name='Parity'))
+fig.add_trace(go.Scatter(x=[8, 16, 32], y=[10000, 10500, 11000], mode='lines+markers', name='H-Store'))
+fig.update_layout(title='Scalability Analysis', xaxis_title='Number of Nodes', yaxis_title='Throughput (TPS)')
+fig.show()
+```
+
+<a href="#performance-results-scalability" class="appendix-link">Return to Performance Results: Scalability</a>
+
+---
+
+### Layer Contribution {#layer-contribution}
+
+```{python}
+import plotly.graph_objects as go
+fig = go.Figure(data=[
+    go.Pie(labels=['Consensus Layer', 'Data Model Layer', 'Execution Layer'],
+           values=[85, 10, 5])
+])
+fig.update_layout(title='Latency Contribution by Layer')
+fig.show()
+```
+
+<a href="#layer-specific-findings" class="appendix-link">Return to Layer-Specific Findings</a>
+
+---
+
+### Key Findings {#key-findings}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    A[Key Findings] --> B[Performance Gap]
+    A --> C[Negative Scalability]
+    A --> D[Execution Inefficiency]
+    A --> E[Consensus Dominance]
+    A --> F[Data Model Impact]
+```
+<p class="mermaid-caption">Figure A6: Key findings from the BLOCKBENCH study</p>
+</div>
+
+<a href="#key-findings-and-implications" class="appendix-link">Return to Key Findings and Implications</a>
+
+---
+
+### Industry Readiness {#industry-readiness}
+
+```{python}
+import plotly.graph_objects as go
+categories = ['Throughput', 'Latency', 'Scalability', 'Security']
+fig = go.Figure()
+fig.add_trace(go.Scatterpolar(r=[3, 3, 2, 5], theta=categories, fill='toself', name='Financial Services'))
+fig.add_trace(go.Scatterpolar(r=[4, 4, 3, 4], theta=categories, fill='toself', name='Supply Chain'))
+fig.add_trace(go.Scatterpolar(r=[3, 4, 3, 5], theta=categories, fill='toself', name='Healthcare'))
+fig.add_trace(go.Scatterpolar(r=[2, 3, 2, 5], theta=categories, fill='toself', name='Real Estate'))
+fig.update_layout(title='Industry Blockchain Readiness', polar=dict(radialaxis=dict(visible=True, range=[0, 5])))
+fig.show()
+```
+
+<a href="#implications-for-industry" class="appendix-link">Return to Implications for Industry</a>
+
+---
+
+### Path Forward {#path-forward}
+
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    A[Path Forward] --> B[Consensus Innovation]
+    A --> C[Execution Optimization]
+    A --> D[Data Model Hybridization]
+    A --> E[Architecture Rethinking]
+```
+<p class="mermaid-caption">Figure A7: Proposed directions for future blockchain development</p>
+</div>
+
+<a href="#conclusion" class="appendix-link">Return to Conclusion</a>
+
+---
+
+## Detailed Results {.appendix}
+
+### YCSB Benchmark Results
+
+```{python}
+import plotly.graph_objects as go
+fig = go.Figure(data=[
+    go.Bar(name='Read Ops', x=['Ethereum', 'Hyperledger', 'Parity', 'H-Store'], y=[350, 1100, 850, 10000]),
+    go.Bar(name='Write Ops', x=['Ethereum', 'Hyperledger', 'Parity', 'H-Store'], y=[245, 770, 595, 7000])
+])
+fig.update_layout(title='YCSB Benchmark Results', xaxis_title='System', yaxis_title='Operations per Second', barmode='group')
+fig.show()
+```
+
+- **Read Operations**:
+  - Ethereum: 300-400 ops/sec
+  - Hyperledger: 1000-1200 ops/sec
+  - Parity: 800-900 ops/sec
+  - H-Store: 10,000+ ops/sec
+- **Write Operations**: 
+  - Generally 30-50% slower than reads across all platforms
+
+::: notes
+This slide shows detailed results from the YCSB benchmark, which tests basic key-value operations. For read operations, Hyperledger performed best among blockchain platforms at 1000-1200 operations per second, followed by Parity and then Ethereum. However, all blockchain systems fell far short of H-Store's 10,000+ operations per second. Write operations were consistently slower than reads across all platforms, typically by 30-50%. This is due to the additional overhead of consensus and state synchronization required for write operations.
 :::
 
-## Lessons & Recommendations
+---
 
-::: {.custom-box}
-Current blockchain platforms are still immature for enterprise usage
+### Smallbank Benchmark Results
+
+```{python}
+import plotly.graph_objects as go
+fig = go.Figure(data=[
+    go.Bar(name='Throughput (TPS)', x=['Ethereum', 'Hyperledger', 'Parity', 'H-Store'], y=[275, 775, 575, 8500])
+])
+fig.update_layout(title='Smallbank Benchmark Results', xaxis_title='System', yaxis_title='Transactions per Second')
+fig.show()
+```
+
+- **Transaction Throughput**:
+  - Ethereum: 250-300 TPS
+  - Hyperledger: 700-850 TPS
+  - Parity: 500-650 TPS
+  - H-Store: 8,000-9,000 TPS
+- **Consistency Testing**:
+  - All systems maintain ACID properties
+  - Blockchain adds overhead for consistency guarantees
+
+::: notes
+The Smallbank benchmark simulates banking transactions to test both performance and consistency guarantees. Hyperledger again led among blockchain platforms with 700-850 transactions per second, followed by Parity and Ethereum. H-Store remained far ahead with 8,000-9,000 TPS. All systems maintained ACID (Atomicity, Consistency, Isolation, Durability) properties, but blockchain systems incurred significant overhead for their consistency guarantees due to the distributed consensus process.
 :::
 
-::: incremental
-- Need more **optimized data models**
-- **Sharding** for improved scalability
-- Better **execution engines** for smart contracts
-- More efficient **consensus protocols**
+---
+
+### EtherId Benchmark Results
+
+```{python}
+import plotly.graph_objects as go
+fig = go.Figure(data=[
+    go.Bar(name='Operations per Second', x=['Ethereum', 'Hyperledger', 'Parity'], y=[45, 125, 80])
+])
+fig.update_layout(title='EtherId Benchmark Results', xaxis_title='System', yaxis_title='Operations per Second')
+fig.show()
+```
+
+- **Complex Smart Contract Operations**:
+  - Ethereum: 40-50 ops/sec
+  - Hyperledger: 100-150 ops/sec
+  - Parity: 70-90 ops/sec
+- **Execution Overhead Analysis**:
+  - VM execution: 40-60% of non-consensus time
+  - State access: 15-25% of non-consensus time
+  - Memory management: 10-20% of non-consensus time
+
+::: notes
+The EtherId benchmark tests complex smart contract operations through a domain name registration scenario. Performance dropped significantly compared to simpler operations, with Hyperledger processing 100-150 operations per second, Parity 70-90 ops/sec, and Ethereum 40-50 ops/sec. The analysis revealed that virtual machine execution consumed 40-60% of non-consensus processing time, with state access and memory management also contributing significantly to overhead. These results highlight the inefficiency of current smart contract execution environments.
 :::
 
-## Conclusions
+---
 
-::: incremental
-- First systematic framework for evaluating private blockchains
-- Significant performance gaps compared to traditional databases
-- Major bottlenecks identified across all platforms
-- Roadmap for future blockchain optimization
+## Reference Materials {.appendix}
+
+### Blockchain Terminology
+
+| Term | Definition |
+|------|------------|
+| **Blockchain** | A distributed digital ledger with a linked chain of blocks containing transaction records |
+| **Private Blockchain** | A permissioned blockchain where participants are known and authorized |
+| **Consensus Protocol** | Mechanism by which nodes agree on the state of the blockchain |
+| **Smart Contract** | Self-executing code that runs on the blockchain |
+| **Node** | A computer that participates in the blockchain network |
+| **Block** | A container of transactions added to the blockchain |
+| **Transaction** | An operation that changes the blockchain state |
+
+::: notes
+This slide provides definitions of key blockchain terminology used throughout the presentation. Understanding these terms is essential for grasping the technical aspects of the BLOCKBENCH framework and its findings.
 :::
 
-## References
+---
 
-- Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017). BLOCKBENCH: A Framework for Analyzing Private Blockchains. Proceedings of the 2017 ACM International Conference on Management of Data.
+### Consensus Protocols
 
-- [GitHub Repository](https://github.com/ooibc88/blockbench)
+| Protocol | Description | Used By | Characteristics |
+|----------|-------------|---------|----------------|
+| **PoW (Proof of Work)** | Nodes solve cryptographic puzzles | Ethereum | High security, high latency, energy intensive |
+| **PBFT (Practical Byzantine Fault Tolerance)** | Multi-round voting process | Hyperledger Fabric | Lower latency, O(n²) message complexity |
+| **PoA (Proof of Authority)** | Authorized validators only | Parity | Low latency, centralization concerns |
 
-## Thank You {.center}
+::: notes
+This slide explains the three main consensus protocols evaluated in the BLOCKBENCH study. Proof of Work requires nodes to solve computationally intensive puzzles, providing strong security but at the cost of performance and energy efficiency. PBFT uses a multi-round voting process that can be faster but scales poorly with network size. Proof of Authority relies on a set of authorized validators, offering better performance but with more centralization.
+:::
 
-::: {style="text-align: center"}
-Questions?
+---
 
-![](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://blockbench-presentation.onrender.com)
+### System Architecture Comparison
 
-Presentation available at: blockbench-presentation.onrender.com
+<div class="mermaid-container">
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '22px', 'primaryColor': '#7C0000', 'primaryBorderColor': '#7C0000', 'primaryTextColor': '#fff', 'secondaryColor': '#006100', 'secondaryBorderColor': '#006100', 'secondaryTextColor': '#fff' }}}%%
+graph TD
+    A[Systems] --> B[Ethereum]
+    A --> C[Hyperledger]
+    A --> D[Parity]
+    B --> B1[Account-based]
+    B --> B2[PoW]
+    B --> B3[EVM]
+    C --> C1[UTXO-based]
+    C --> C2[PBFT]
+    C --> C3[Docker]
+    D --> D1[Account-based]
+    D --> D2[PoA]
+    D --> D3[EVM]
+```
+<p class="mermaid-caption">Figure A8: Comparison of system architectures</p>
+</div>
+
+| System | Data Model | Consensus | Execution Environment |
+|--------|------------|-----------|----------------------|
+| **Ethereum** | Account-based | PoW | EVM (stack-based VM) |
+| **Hyperledger** | UTXO-based | PBFT | Docker container |
+| **Parity** | Account-based | PoA | EVM (stack-based VM) |
+
+::: notes
+This slide compares the architectural choices of the three blockchain systems evaluated. Ethereum and Parity use account-based data models, while Hyperledger employs a UTXO (Unspent Transaction Output) model similar to Bitcoin. For consensus, Ethereum uses Proof of Work, Hyperledger implements PBFT, and Parity uses Proof of Authority. The execution environments also differ: Ethereum and Parity use the Ethereum Virtual Machine (EVM), a stack-based interpreter, while Hyperledger executes chaincode in Docker containers. These architectural differences explain many of the performance variations observed in the benchmarks.
+:::
+
+---
+
+### Future Research Directions
+
+- **Layered Consensus Protocols**: Separate consensus for different operation types
+- **Just-In-Time Compilation**: Smart contract optimization techniques
+- **Sharding Approaches**: Horizontal partitioning for scalability
+- **Hybrid Architecture**: Blockchain for trust, databases for performance
+- **Hardware Acceleration**: Specialized hardware for cryptographic operations
+
+::: notes
+Based on the BLOCKBENCH findings, several research directions could address the identified limitations. Layered consensus protocols could apply different consensus mechanisms based on operation criticality. JIT compilation could dramatically improve smart contract execution efficiency. Sharding approaches could enable horizontal scaling by partitioning the blockchain. Hybrid architectures could combine blockchain for trust with databases for performance-critical operations. Hardware acceleration could improve the performance of cryptographic operations that are central to blockchain functioning.
+:::
+
+---
+
+### References
+
+1. Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017). BLOCKBENCH: A framework for analyzing private blockchains. In Proceedings of the 2017 ACM International Conference on Management of Data (pp. 1085-1100).
+
+2. Nakamoto, S. (2008). Bitcoin: A peer-to-peer electronic cash system. Bitcoin.org
+
+3. Wood, G. (2014). Ethereum: A secure decentralised generalised transaction ledger. Ethereum project yellow paper.
+
+4. Androulaki, E., Barger, A., Bortnikov, V., et al. (2018). Hyperledger fabric: a distributed operating system for permissioned blockchains. In Proceedings of the Thirteenth EuroSys Conference (pp. 1-15).
+
+::: notes
+These references provide additional background on the blockchain systems evaluated in the BLOCKBENCH study. The primary reference is the original BLOCKBENCH paper by Dinh et al. Additional references include the foundational Bitcoin whitepaper by Satoshi Nakamoto, the Ethereum yellow paper by Gavin Wood, and the Hyperledger Fabric paper by Androulaki et al.
+:::
+
+---
+
+### Additional Definitions
+
+| Term | Definition |
+|------|------------|
+| **Throughput** | Number of transactions processed per second |
+| **Latency** | Time from submission to confirmation of a transaction |
+| **Scalability** | System performance change as network size increases |
+| **EVM** | Ethereum Virtual Machine - execution environment for smart contracts |
+| **UTXO** | Unspent Transaction Output - data model used in Bitcoin and some other blockchains |
+| **Sharding** | Technique of partitioning data across multiple nodes |
+| **Gas** | Unit measuring computational work in Ethereum |
+
+::: notes
+This slide provides definitions for additional technical terms used in the presentation. Understanding these concepts is important for interpreting the BLOCKBENCH results and their implications for blockchain system design and deployment.
 :::
