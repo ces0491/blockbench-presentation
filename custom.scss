@@ -8,6 +8,10 @@ $presentation-font-family: $font-family-sans-serif !default;
 $presentation-heading-font: $font-family-sans-serif !default;
 $code-block-font-family: $font-family-monospace !default;
 
+// Define colors for consistency
+$primary-color: #0288d1 !default;
+$border-color: #2c82c9 !default;
+
 /*-- scss:rules --*/
 
 .reveal {
@@ -24,6 +28,9 @@ $code-block-font-family: $font-family-monospace !default;
 
   h1, h2, h3, h4, h5, h6 {
     font-family: $presentation-heading-font !important;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.8em !important;
+    padding-top: 0.2em !important;
   }
 
   code, pre {
@@ -34,12 +41,94 @@ $code-block-font-family: $font-family-monospace !default;
   #title-slide {
     .title {
       font-size: 2.8em;
-      border-bottom: 2px solid #2c82c9;
+      border-bottom: 2px solid $border-color;
       padding-bottom: 0.2em;
     }
 
     .qrcode-container {
       margin-top: 2em;
+    }
+  }
+
+  // Ensure content is properly positioned on slide
+  .slides section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    & > *:first-child {
+      margin-top: 0.5em !important;
+    }
+  }
+
+  // Fix for column layouts
+  .columns {
+    display: flex;
+    height: 80%;
+    margin-top: 2em;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start; // Align columns at the top
+    gap: 1em; // Add spacing between columns
+  }
+
+  // Styles for columns
+  .column {
+    display: flex;
+    flex-direction: column;
+    width: 100%; // Respects assigned width (e.g., 50%)
+    height: 100%;
+    padding: 1em;
+    box-sizing: border-box;
+
+    // Text content (e.g., lists, paragraphs) in columns
+    & > *:not(.chart-container):not(.mermaid):not(div.plotly):not(iframe):not(img) {
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      margin: 0 !important;
+      width: 100%;
+    }
+
+    // Center and size chart containers
+    .chart-container,
+    .mermaid,
+    div.plotly,
+    .mermaid svg,
+    .plotly-graph-div {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+      height: 100% !important; // Fill column height
+      max-width: 100% !important;
+      max-height: 100% !important;
+    }
+
+    // Ensure Plotly charts scale to fill container
+    .plotly-graph-div {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 400px !important; // Ensure minimum height for visibility
+    }
+
+    // Ensure Mermaid diagrams scale appropriately
+    .mermaid svg {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 100% !important;
+      display: block !important;
+    }
+
+    // Center images and iframes in columns
+    img,
+    iframe {
+      display: block !important;
+      margin: 0 auto !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      height: auto !important;
     }
   }
 }
