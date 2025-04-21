@@ -21,11 +21,45 @@ format:
     include-in-header:
       - text: |
           <script src="https://unpkg.com/mermaid@9/dist/mermaid.min.js"></script>
+          <script>
+            function resizePlotlyCharts() {
+              var charts = document.querySelectorAll('.plotly-graph-div');
+              charts.forEach(function(chart) {
+                if (window.Plotly) {
+                  Plotly.Plots.resize(chart);
+                }
+                chart.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+              });
+            }
+
+            // Retry resize multiple times to ensure rendering
+            function retryResize(times, delay) {
+              let attempts = 0;
+              const interval = setInterval(() => {
+                resizePlotlyCharts();
+                attempts++;
+                if (attempts >= times) {
+                  clearInterval(interval);
+                }
+              }, delay);
+            }
+
+            // Resize on slide change
+            Reveal.addEventListener('slidechanged', function(event) {
+              resizePlotlyCharts();
+              retryResize(3, 200);
+            });
+
+            // Resize on initial load
+            Reveal.addEventListener('ready', function(event) {
+              resizePlotlyCharts();
+              retryResize(3, 200);
+            });
+          </script>
     auto-slide: false
 execute:
   echo: false
   eval: true
-  freeze: auto
 ---
 
 # Presentation Overview {.center}
@@ -59,7 +93,7 @@ We'll begin with a brief introduction to private blockchains, then explore why B
   - Hyperledger Fabric
   - Parity
 
-[For more on Blockchain Types, see Appendix](#blockchain-types)
+[See Appendix for more on blockchain types](#blockchain-types)
 
 
 ::: notes
@@ -205,7 +239,7 @@ The researchers designed four workloads to stress different aspects of blockchai
 - **Parameter Optimization**: Each system configured optimally
 :::
 
-::: {.column width="50%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="50%" .mermaid-container}
 ```{mermaid}
 graph TD
     A[Setup] --> B[Systems: Ethereum, Hyperledger, Parity, H-Store]
@@ -225,10 +259,10 @@ graph TD
 The evaluation was conducted on a 48-node cluster, allowing for tests with varying network sizes. Each system was configured for optimal performance before testing, ensuring fair comparison. The researchers employed statistical rigor by running each test multiple times with different random seeds and reporting results with confidence intervals. The inclusion of H-Store provides a crucial baseline for understanding how blockchain systems compare to traditional technology.
 :::
 
-# Performance Results: Throughput {.center}
+# Performance Results: Throughput {.center data-state="performance-results-throughput"}
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="30%"}
 - **Blockchain vs Database**:
   - H-Store: 10,000+ TPS
   - Private Blockchains: 1,000-3,000 TPS peak
@@ -238,7 +272,7 @@ The evaluation was conducted on a 48-node cluster, allowing for tests with varyi
   - Parity: Performance varies by workload
 :::
 
-::: {.column width="60%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="70%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
@@ -248,13 +282,15 @@ fig = go.Figure(data=[
 ])
 fig.update_layout(
     autosize=True,
+    width=600,
+    height=400,
     title={'text': 'Throughput Comparison', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
     yaxis_title={'text': 'Transactions per Second', 'font': {'size': 12}},
     font={'size': 10},
-    height=450,
     margin=dict(t=50, b=50, l=50, r=20),
-    plot_bgcolor='rgba(240, 240, 240, 0.8)'
+    plot_bgcolor='rgba(240, 240, 240, 0.8)',
+    dragmode=False
 )
 fig.update_yaxes(gridcolor='rgba(200, 200, 200, 0.2)')
 fig.show()
@@ -266,10 +302,10 @@ fig.show()
 The throughput results reveal a significant performance gap between blockchain systems and traditional databases. H-Store consistently achieved over 10,000 transactions per second, while blockchain systems peaked between 1,000 and 3,000 TPS. Hyperledger showed higher peak throughput but with more variability. Ethereum was consistent, while Parity's performance depended on workload type.
 :::
 
-# Performance Results: Latency {.center}
+# Performance Results: Latency {.center data-state="performance-results-latency"}
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="30%"}
 - **Transaction Confirmation Time**:
   - H-Store: Milliseconds
   - Ethereum: 3-10 seconds
@@ -281,7 +317,7 @@ The throughput results reveal a significant performance gap between blockchain s
   - PoA (Parity): Varies with validator count
 :::
 
-::: {.column width="60%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="70%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
@@ -293,13 +329,15 @@ fig = go.Figure(data=[
            textposition='auto')
 ])
 fig.update_layout(
+    dragmode=False,
     autosize=True,
     title={'text': 'Latency Comparison (Log Scale)', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
     yaxis_title={'text': 'Latency (ms)', 'font': {'size': 12}},
     yaxis_type="log",
     font={'size': 10},
-    height=450,
+    width=600,
+    height=400,
     margin=dict(t=50, b=50, l=50, r=20),
     plot_bgcolor='rgba(240, 240, 240, 0.8)'
 )
@@ -313,10 +351,10 @@ fig.show()
 Latency results show dramatic differences. Traditional databases commit transactions in milliseconds, while blockchain systems require hundreds of milliseconds to several seconds. Ethereum's Proof of Work has the highest latencies (3-10 seconds). Hyperledger's PBFT is faster but scales poorly. Parity's Proof of Authority varies with validator count.
 :::
 
-# Performance Results: Scalability {.center}
+# Performance Results: Scalability {.center data-state="performance-results-scalability"}
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="30%"}
 - **Negative Scalability**:
   - Performance degrades as nodes increase
   - 30-50% reduction when doubling nodes
@@ -327,7 +365,7 @@ Latency results show dramatic differences. Traditional databases commit transact
   - H-Store: Near-linear scaling (positive)
 :::
 
-::: {.column width="60%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="70%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure()
@@ -340,9 +378,12 @@ fig.update_layout(
     xaxis_title={'text': 'Number of Nodes', 'font': {'size': 12}},
     yaxis_title={'text': 'Throughput (TPS)', 'font': {'size': 12}},
     font={'size': 10},
-    height=450,
+    width=600,
+    height=400,
     margin=dict(t=50, b=50, l=50, r=20),
-    plot_bgcolor='rgba(240, 240, 240, 0.8)'
+    plot_bgcolor='rgba(240, 240, 240, 0.8)',
+    dragmode=False,
+    autosize=True
 )
 fig.update_yaxes(gridcolor='rgba(200, 200, 200, 0.2)')
 fig.show()
@@ -354,10 +395,10 @@ fig.show()
 Blockchain systems exhibit negative scalability, with performance degrading by 30-50% when doubling nodes. Hyperledger's PBFT suffers from quadratic message complexity, and Ethereum's PoW faces propagation delays. In contrast, H-Store scales positively, highlighting a key challenge for blockchain adoption.
 :::
 
-# Layer-Specific Findings {.center}
+# Layer-Specific Findings {.center data-state="layer-specific-findings"}
 
 ::: {.columns}
-::: {.column width="40%"}
+::: {.column width="30%"}
 - **Consensus Layer**: 80-90% of total latency
 - **Data Model Layer**:
   - Account-based (Ethereum): Better for read-heavy workloads
@@ -368,7 +409,7 @@ Blockchain systems exhibit negative scalability, with performance degrading by 3
   - Limited optimization capabilities
 :::
 
-::: {.column width="60%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="70%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
@@ -377,10 +418,12 @@ fig = go.Figure(data=[
            marker=dict(colors=['#0288d1', '#03a9f4', '#4fc3f7']))
 ])
 fig.update_layout(
+    dragmode=False,
     autosize=True,
     title={'text': 'Latency Contribution by Layer', 'font': {'size': 16}},
     font={'size': 10},
-    height=450,
+    width=600,
+    height=400,
     margin=dict(t=50, b=50, l=50, r=20)
 )
 fig.show()
@@ -394,8 +437,9 @@ The consensus layer dominates latency (80-90%). Ethereum's account-based model s
 
 # Key Findings and Implications {.center}
 
-::: {style="height: 100%; display: flex; flex-direction: column;"}
-::: {style="display: flex; height: 40%;"}
+::: {style="display: grid; grid-template-rows: 40vh 60vh; width: 100%;"}
+
+::: {style="overflow: auto;"}
 - **Performance Gap**: Private blockchains significantly underperform databases
 - **Negative Scalability**: Adding nodes decreases performance
 - **Execution Inefficiency**: Smart contracts introduce major overhead
@@ -403,7 +447,7 @@ The consensus layer dominates latency (80-90%). Ethereum's account-based model s
 - **Data Model Impact**: Selection affects workload suitability
 :::
 
-::: {style="display: flex; justify-content: center; align-items: center; height: 60%;"}
+::: {style="overflow: auto;"}
 ```{mermaid}
 %%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
 graph TD
@@ -454,7 +498,7 @@ Financial services may need hybrid solutions due to performance limitations. Sup
   - Architecture rethinking
 :::
 
-::: {.column width="50%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="50%" .mermaid-container}
 ```{mermaid}
 %%{init: {'theme': 'default', 'themeVariables': {'fontSize': '18px'}}}%%
 graph TD
@@ -622,7 +666,7 @@ graph TD
   - Requires optimization
 :::
 
-::: {.column width="70%" style="display: flex; justify-content: center; align-items: center;"}
+::: {.column width="70%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 categories = ['Throughput', 'Latency', 'Scalability', 'Security']
@@ -636,14 +680,16 @@ fig.update_layout(
     polar=dict(radialaxis=dict(visible=True, range=[0, 5])),
     font={'size': 10},
     height=450,
-    margin=dict(t=50, b=50, l=50, r=20)
+    margin=dict(t=50, b=50, l=50, r=20),
+    dragmode=False,
+    autosize=True
 )
 fig.show()
 ```
 :::
 :::
 
-## YCSB Benchmark Results {#ycsb-benchmark data-id="ycsb-benchmark" .center}
+## YCSB Benchmark Results {#ycsb-benchmark data-id="ycsb-benchmark" .center data-state="ycsb-benchmark"}
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -656,7 +702,7 @@ fig.show()
   - 30-50% slower than reads
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
@@ -664,6 +710,7 @@ fig = go.Figure(data=[
     go.Bar(name='Write Ops', x=['Ethereum', 'Hyperledger', 'Parity', 'H-Store'], y=[245, 770, 595, 7000])
 ])
 fig.update_layout(
+    dragmode=False,
     autosize=True,
     title={'text': 'YCSB Benchmark Results', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
@@ -682,7 +729,7 @@ fig.show()
 The YCSB benchmark tests key-value operations. Hyperledger led blockchain platforms at 1000-1200 read ops/sec, followed by Parity and Ethereum. H-Store achieved 10,000+ ops/sec. Write operations were 30-50% slower due to consensus and state synchronization overhead.
 :::
 
-## Smallbank Benchmark Results {#smallbank-benchmark data-id="smallbank-benchmark"}
+## Smallbank Benchmark Results {#smallbank-benchmark data-id="smallbank-benchmark" .center data-state="smallbank-benchmark"}
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -695,14 +742,14 @@ The YCSB benchmark tests key-value operations. Hyperledger led blockchain platfo
   - All systems maintain ACID properties
 :::
 
-::: {.column width="50%"}
-::: {.chart-container}
+::: {.column width="50%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
     go.Bar(name='Throughput (TPS)', x=['Ethereum', 'Hyperledger', 'Parity', 'H-Store'], y=[275, 775, 575, 8500])
 ])
 fig.update_layout(
+    dragmode=False,
     autosize=True,
     title={'text': 'Smallbank Benchmark Results', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
@@ -721,7 +768,7 @@ fig.show()
 The Smallbank benchmark tests banking transactions. Hyperledger led with 700-850 TPS, followed by Parity and Ethereum. H-Store achieved 8,000-9,000 TPS. All systems maintained ACID properties, but blockchains incurred overhead for consistency.
 :::
 
-## EtherId Benchmark Results {#etherid-benchmark data-id="etherid-benchmark"}
+## EtherId Benchmark Results {#etherid-benchmark data-id="etherid-benchmark" .center data-state="etherid-benchmark"}
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -735,14 +782,14 @@ The Smallbank benchmark tests banking transactions. Hyperledger led with 700-850
   - Memory management: 10-20%
 :::
 
-::: {.column width="50%"}
-::: {.chart-container}
+::: {.column width="50%" .chart-container}
 ```{python}
 import plotly.graph_objects as go
 fig = go.Figure(data=[
     go.Bar(name='Operations per Second', x=['Ethereum', 'Hyperledger', 'Parity'], y=[45, 125, 80])
 ])
 fig.update_layout(
+    dragmode=False,
     autosize=True,
     title={'text': 'EtherId Benchmark Results', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
@@ -775,9 +822,9 @@ Proof of Work (PoW) offers strong security but high latency. PBFT is faster but 
 
 ## System Architecture Comparison {#system-architecture data-id="system-architecture"}
 
-::: {style="height: 100%; display: flex; flex-direction: column;"}
+::: {style="display: grid; grid-template-rows: 60vh 40vh; width: 100%;"}
 
-::: {style="height: 60%;"}
+::: {style="overflow: auto;"}
 ```{mermaid}
 %%{init: {'theme': 'default', 'themeVariables': {'fontSize': '22px'}}}%%
 graph TD
@@ -797,7 +844,7 @@ graph TD
 ```
 :::
 
-::: {style="height: 40%;"}
+::: {style="overflow: auto;"}
 | System | Data Model | Consensus | Execution Environment |
 |--------|------------|-----------|----------------------|
 | Ethereum | Account-based | PoW | EVM |

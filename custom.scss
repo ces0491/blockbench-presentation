@@ -15,7 +15,7 @@ $border-color: #2c82c9 !default;
 /*-- scss:rules --*/
 
 .reveal {
-  // Completely disable font loading
+  // Disable external font loading, force system fonts
   @font-face {
     font-display: block;
     font-family: "Font Disabled";
@@ -23,21 +23,21 @@ $border-color: #2c82c9 !default;
     unicode-range: U+0-10FFFF;
   }
 
-  // Force system fonts
   font-family: $presentation-font-family !important;
 
+  // Heading styles
   h1, h2, h3, h4, h5, h6 {
     font-family: $presentation-heading-font !important;
-    margin-top: 0.5em !important;
-    margin-bottom: 0.8em !important;
+    margin: 0.5em 0 0.8em !important;
     padding-top: 0.2em !important;
   }
 
+  // Code styles
   code, pre {
     font-family: $code-block-font-family !important;
   }
 
-  // Title slide specific styles
+  // Title slide styles
   #title-slide {
     .title {
       font-size: 2.8em;
@@ -50,7 +50,7 @@ $border-color: #2c82c9 !default;
     }
   }
 
-  // Ensure content is properly positioned on slide
+  // Slide content positioning
   .slides section {
     height: 100%;
     display: flex;
@@ -61,59 +61,64 @@ $border-color: #2c82c9 !default;
     }
   }
 
-  // Fix for column layouts
+  // Column layout
   .columns {
     display: flex;
     height: 80%;
     margin-top: 2em;
     width: 100%;
     justify-content: space-between;
-    align-items: flex-start; // Align columns at the top
-    gap: 1em; // Add spacing between columns
+    align-items: flex-start;
+    gap: 1em;
   }
 
-  // Styles for columns
+  // Column styles
   .column {
     display: flex;
     flex-direction: column;
-    width: 100%; // Respects assigned width (e.g., 50%)
+    width: 100%;
     height: 100%;
     padding: 1em;
     box-sizing: border-box;
 
-    // Text content (e.g., lists, paragraphs) in columns
-    & > *:not(.chart-container):not(.mermaid):not(div.plotly):not(iframe):not(img) {
+    // Text content (lists, paragraphs, etc.)
+    & > *:not(.chart-container):not(.mermaid):not(.plotly-graph-div):not(iframe):not(img) {
+      font-size: 0.8em !important;
+      line-height: 1.3 !important;
+      text-align: left !important;
       justify-content: flex-start !important;
       align-items: flex-start !important;
-      text-align: left !important;
-      margin: 0 !important;
       width: 100%;
+      margin: 0 !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
     }
 
-    // Center and size chart containers
+    // Chart and diagram containers
     .chart-container,
     .mermaid,
-    div.plotly,
-    .mermaid svg,
     .plotly-graph-div {
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
-      margin: 0 auto !important;
       width: 100% !important;
-      height: 100% !important; // Fill column height
+      height: 100% !important;
       max-width: 100% !important;
+      max-height: 100% !important;
+      margin: 0 auto !important;
+      overflow: visible !important;
+      position: relative !important;
+    }
+
+    // Plotly-specific styles
+    .plotly-graph-div {
+      min-height: 400px !important;
+      width: 100% !important;
+      height: auto !important;
       max-height: 100% !important;
     }
 
-    // Ensure Plotly charts scale to fill container
-    .plotly-graph-div {
-      width: 100% !important;
-      height: 100% !important;
-      min-height: 400px !important; // Ensure minimum height for visibility
-    }
-
-    // Ensure Mermaid diagrams scale appropriately
+    // Mermaid-specific styles
     .mermaid svg {
       width: 100% !important;
       height: auto !important;
@@ -121,7 +126,7 @@ $border-color: #2c82c9 !default;
       display: block !important;
     }
 
-    // Center images and iframes in columns
+    // Images and iframes
     img,
     iframe {
       display: block !important;
@@ -131,11 +136,17 @@ $border-color: #2c82c9 !default;
       height: auto !important;
     }
   }
-}
 
-// Disable any @font-face declarations globally
-@font-face {
-  font-display: block;
-  font-family: "Fake Font";
-  src: local("Arial");
+  // Slide-specific font size adjustments
+  .slides section[data-state="performance-results-throughput"] .column,
+  .slides section[data-state="performance-results-latency"] .column,
+  .slides section[data-state="performance-results-scalability"] .column,
+  .slides section[data-state="layer-specific-findings"] .column,
+  .slides section[data-state="ycsb-benchmark"] .column,
+  .slides section[data-state="smallbank-benchmark"] .column,
+  .slides section[data-state="etherid-benchmark"] .column {
+    & > *:not(.chart-container):not(.mermaid):not(.plotly-graph-div):not(iframe):not(img) {
+      font-size: 0.75em !important;
+    }
+  }
 }
