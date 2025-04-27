@@ -282,8 +282,8 @@ fig = go.Figure(data=[
 ])
 fig.update_layout(
     autosize=True,
-    width=600,
-    height=400,
+    width=1100,
+    height=600,
     title={'text': 'Throughput Comparison', 'font': {'size': 16}},
     xaxis_title={'text': 'System', 'font': {'size': 12}},
     yaxis_title={'text': 'Transactions per Second', 'font': {'size': 12}},
@@ -336,8 +336,8 @@ fig.update_layout(
     yaxis_title={'text': 'Latency (ms)', 'font': {'size': 12}},
     yaxis_type="log",
     font={'size': 10},
-    width=600,
-    height=400,
+    width=1100,
+    height=600,
     margin=dict(t=50, b=50, l=50, r=20),
     plot_bgcolor='rgba(240, 240, 240, 0.8)'
 )
@@ -378,8 +378,8 @@ fig.update_layout(
     xaxis_title={'text': 'Number of Nodes', 'font': {'size': 12}},
     yaxis_title={'text': 'Throughput (TPS)', 'font': {'size': 12}},
     font={'size': 10},
-    width=600,
-    height=400,
+    width=1100,
+    height=600,
     margin=dict(t=50, b=50, l=50, r=20),
     plot_bgcolor='rgba(240, 240, 240, 0.8)',
     dragmode=False,
@@ -422,8 +422,8 @@ fig.update_layout(
     autosize=True,
     title={'text': 'Latency Contribution by Layer', 'font': {'size': 16}},
     font={'size': 10},
-    width=600,
-    height=400,
+    width=800,
+    height=600,
     margin=dict(t=50, b=50, l=50, r=20)
 )
 fig.show()
@@ -437,7 +437,7 @@ The consensus layer dominates latency (80-90%). Ethereum's account-based model s
 
 # Key Findings and Implications {.center}
 
-::: {style="display: grid; grid-template-rows: 40vh 60vh; width: 100%;"}
+::: {style="display: grid; grid-template-rows: 45vh 55vh; width: 100%;"}
 
 ::: {style="overflow: auto;"}
 - **Performance Gap**: Private blockchains significantly underperform databases
@@ -528,10 +528,10 @@ any questions
 
 # Appendix {.appendix .center}
 
-The following slides contain supplementary information including charts, diagrams, references, and detailed results from the paper.
+The following slides contain supplementary information including charts, diagrams, references, definitions and more detailed results from the paper.
 
 ## Additional Resources {.center}
-- [Github Repository](https://github.com/ces0491/blockbench-presentation)
+- [Github Repository for this presentation](https://github.com/ces0491/blockbench-presentation)
 - Follow-up resources:
   - [BLOCKBENCH GitHub Repo](github.com/ooibc88/blockbench)
   - [Paper: BLOCKBENCH: A Framework for Analyzing Private Blockchains](#bb-paper)
@@ -541,7 +541,7 @@ The following slides contain supplementary information including charts, diagram
 
 <iframe src="https://www.comp.nus.edu.sg/~ooibc/blockbench.pdf" width="100%" height="800px"></iframe>
 
-[View BLOCKBENCH Paper](https://www.comp.nus.edu.sg/~ooibc/blockbench.pdf){target="_blank"}
+[View BLOCKBENCH Paper online](https://www.comp.nus.edu.sg/~ooibc/blockbench.pdf){target="_blank"}
 
 ::: notes
 This is the original BLOCKBENCH paper by Dinh et al. (2017). Full citation: Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017). BLOCKBENCH: A framework for analyzing private blockchains. In Proceedings of the 2017 ACM International Conference on Management of Data (pp. 1085-1100).
@@ -857,6 +857,99 @@ graph TD
 Ethereum and Parity use account-based models with EVM execution, while Hyperledger uses UTXO and Docker. These architectural choices explain performance differences observed in the benchmarks.
 :::
 
+## Alternatives to BLOCKBENCH {#blockbench-alternatives data-id="blockbench-alternatives" .center}
+
+<!-- ::: {style="display: grid; grid-template-rows: 30vh 70vh; width: 100%;"} -->
+
+<!-- ::: {style="overflow: auto;"} -->
+<!-- ```{mermaid} -->
+<!-- %%{init: {'theme': 'default', 'themeVariables': {'fontSize': '22px'}}}%% -->
+<!-- graph LR -->
+<!--     A[Blockchain Benchmarking Frameworks] --> B[BLOCKBENCH] -->
+<!--     A --> C[Hyperledger Caliper] -->
+<!--     A --> D[Chainhammer] -->
+<!--     A --> E[DAppBench] -->
+<!--     A --> F[Industry-specific] -->
+
+<!--     B --> B1[Cross-platform, DB comparison] -->
+<!--     C --> C1[Hyperledger-focused, actively maintained] -->
+<!--     D --> D1[Throughput-focused, lightweight] -->
+<!--     E --> E1[DApp-oriented metrics] -->
+<!--     F --> F1[Financial use case optimization] -->
+
+<!--     style A fill:#0288d1,stroke:#0277bd,color:#fff -->
+<!--     style B fill:#03a9f4,stroke:#0288d1,color:#fff -->
+<!-- ``` -->
+<!-- ::: -->
+
+<!-- ::: {style="overflow: auto;"} -->
+| Framework | Focus | Strengths | Limitations |
+|-----------|-------|-----------|-------------|
+| **BLOCKBENCH** | Private blockchains, DB comparison | Cross-platform, layered analysis | Less active maintenance |
+| **Hyperledger Caliper** | Hyperledger frameworks | Active development, industry adoption | Limited to Hyperledger |
+| **Chainhammer** | Transaction throughput | Lightweight, easy setup | Narrower metrics focus |
+| **DAppBench** | Decentralized applications | User experience, contract costs | Less infrastructure focus |
+| **Industry Benchmarks** | (JP Morgan, R3) | Industry-specific optimizations | Not publicly available |
+<!-- ::: -->
+<!-- ::: -->
+
+::: notes
+BLOCKBENCH was pioneering but several alternatives have emerged. Hyperledger Caliper is actively maintained by the Linux Foundation specifically for Hyperledger frameworks. Chainhammer from the University of Vienna focuses specifically on transaction throughput with a lightweight approach. DAppBench shifts focus to application-level metrics like smart contract execution costs and user experience rather than just infrastructure. Many financial firms have developed proprietary benchmarks tailored to their specific use cases. The key advantage of BLOCKBENCH remains its systematic cross-platform comparison capability, especially in benchmarking against traditional databases.
+:::
+
+## Resources for Further Learning {#learning-resources data-id="learning-resources" .center}
+
+::: {.columns}
+::: {.column width="50%"}
+#### Ethereum for Enterprise
+- [Enterprise Ethereum Alliance](https://entethalliance.org/)
+- [Quorum Documentation](https://consensys.net/quorum/)
+- "Building Enterprise Blockchain Solutions on Ethereum" (Pluralsight)
+
+#### Hyperledger Fabric
+- [Official Documentation](https://hyperledger-fabric.readthedocs.io/)
+- "Blockchain for Business" (edX by Linux Foundation)
+- [IBM Blockchain Platform Tutorials](https://developer.ibm.com/tutorials/)
+:::
+
+::: {.column width="50%"}
+#### Parity/Polkadot
+- [Substrate Developer Hub](https://substrate.dev/)
+- [Parity Technologies Documentation](https://www.parity.io/technologies/)
+- "Building on Polkadot" tutorial series
+
+#### Comparative Resources
+- "Enterprise Blockchain Protocols" by ConsenSys
+- "Blockchain Architecture Database" by Rokos & Dexter
+- "Introduction to Hyperledger Technologies" (Linux Foundation)
+:::
+:::
+
+::: {style="display: flex; justify-content: center; align-items: center; margin-top: 30px;"}
+```{mermaid}
+%%{init: {'theme': 'default', 'themeVariables': {'fontSize': '20px'}}}%%
+graph LR
+    A[Learning Path] --> B[Beginner]
+    A --> C[Intermediate]
+    A --> D[Advanced]
+    
+    B --> B1[edX/Linux Foundation Courses]
+    B --> B2[Overview Documentation]
+    
+    C --> C1[Tutorials & Labs]
+    C --> C2[Comparative Analysis]
+    
+    D --> D1[Technical Documentation]
+    D --> D2[Academic Research]
+    
+    style A fill:#0288d1,stroke:#0277bd,color:#fff
+```
+:::
+
+::: notes
+resources for exploring these blockchain frameworks further
+:::
+
 ## Future Research Directions {#future-research data-id="future-research"}
 
 - **Layered Consensus Protocols**: Tailored consensus per operation
@@ -871,26 +964,66 @@ Future research should focus on layered consensus, JIT compilation, sharding, hy
 
 ## References {#references data-id="references"}
 
-- Dinh, T. T. A., et al. (2017). BLOCKBENCH: A framework for analyzing private blockchains. In Proceedings of the 2017 ACM International Conference on Management of Data (pp. 1085-1100).
+- Dinh, T. T. A., Wang, J., Chen, G., Liu, R., Ooi, B. C., & Tan, K. L. (2017). BLOCKBENCH: A framework for analyzing private blockchains. In *Proceedings of the 2017 ACM International Conference on Management of Data* (pp. 1085-1100).
+
+- Visa Inc. (2023). Visa Fact Sheet: VisaNet Processing. [visa.com/visanet](https://usa.visa.com/run-your-business/small-business-tools/retail.html)
+
 - Nakamoto, S. (2008). Bitcoin: A peer-to-peer electronic cash system. Bitcoin.org
+
+- Androulaki, E., et al. (2018). Hyperledger fabric: a distributed operating system for permissioned blockchains. In *Proceedings of the Thirteenth EuroSys Conference*.
+
 - Wood, G. (2014). Ethereum: A secure decentralised generalised transaction ledger. Ethereum project yellow paper.
-- Androulaki, E., et al. (2018). Hyperledger fabric: a distributed operating system for permissioned blockchains. In Proceedings of the Thirteenth EuroSys Conference.
+
+- Croman, K., et al. (2016). On scaling decentralized blockchains. In *International Conference on Financial Cryptography and Data Security* (pp. 106-125).
+
+- Pongnumkul, S., Siripanpornchana, C., & Thajchayapong, S. (2017). Performance analysis of private blockchain platforms in varying workloads. In *2017 26th International Conference on Computer Communication and Networks* (ICCCN) (pp. 1-6).
+
+- Hyperledger Foundation. (2021). Hyperledger Caliper: Blockchain Benchmark Framework. [hyperledger.org/caliper](https://www.hyperledger.org/use/caliper)
+
+- Scherer, M. (2017). Performance and scalability of blockchain networks and smart contracts. Master's thesis, Umea University, Department of Computing Science.
 
 ::: notes
-These references provide background on BLOCKBENCH and the evaluated blockchain systems, including foundational papers on Bitcoin, Ethereum, and Hyperledger Fabric.
+These references provide the academic foundation for our presentation. The Dinh et al. paper is the primary BLOCKBENCH paper. The Visa reference documents their processing capacity of 24,000+ transactions per second. The Bitcoin whitepaper by Nakamoto and supplementary analysis by Croman et al. explain Bitcoin's throughput limitations of approximately 7 transactions per second. The papers by Androulaki and Wood provide technical details on Hyperledger Fabric and Ethereum respectively. Pongnumkul's work offers additional performance analysis that complements BLOCKBENCH. The Hyperledger Caliper reference covers an alternative benchmarking framework. Scherer's thesis provides additional insight into blockchain scalability challenges.
 :::
 
-## Definitions {#definitions data-id="definitions"}
+## Definitions (1/2) {#definitions-1 data-id="definitions-1" .center}
 
+::: {.table-container style="display: flex; justify-content: center; align-items: center; height: 75vh; font-size: 0.95em;"}
 | Term | Definition |
 |------|------------|
-| Block | Container of transactions |
-| Blockchain | Distributed ledger of linked blocks |
-| Consensus Protocol | Mechanism for node agreement |
-| EVM | Ethereum Virtual Machine for smart contracts |
-| Latency | Time to confirm a transaction |
-| Private Blockchain | Permissioned blockchain with known participants |
-| Scalability | Performance change with network size |
-| Smart Contract | Self-executing blockchain code |
-| Throughput | Transactions per second |
-| UTXO | Unspent Transaction Output data model |
+| Block | Container of transactions that forms a unit in the blockchain |
+| Blockchain | Distributed ledger of linked blocks forming an immutable record |
+| Consensus Protocol | Mechanism by which nodes in a distributed system agree on the state of the ledger |
+| Proof of Work (PoW) | Consensus mechanism requiring computational work to validate transactions and create blocks |
+| Proof of Authority (PoA) | Consensus mechanism where approved validator nodes confirm transactions based on identity |
+| Practical Byzantine Fault Tolerance (PBFT) | Consensus algorithm that can achieve agreement even if some nodes fail or act maliciously |
+| Sharding | Technique to split the blockchain network into partitions (shards) to improve scalability |
+| EVM | Ethereum Virtual Machine for executing smart contracts |
+| Latency | Time taken to confirm a transaction on the blockchain |
+| Throughput | Number of transactions processed per second |
+:::
+
+::: notes
+These definitions cover the core consensus mechanisms discussed in the BLOCKBENCH paper. Proof of Work is used by Ethereum in the study and requires significant computational resources. Proof of Authority is the more centralized approach used by Parity. PBFT is Hyperledger's consensus mechanism that provides Byzantine fault tolerance. Sharding is one approach to solving blockchain's scalability challenges, though it wasn't implemented in the systems tested by BLOCKBENCH.
+:::
+
+## Definitions (2/2) {#definitions-2 data-id="definitions-2" .center}
+
+::: {.table-container style="display: flex; justify-content: center; align-items: center; height: 75vh; font-size: 0.95em;"}
+| Term | Definition |
+|------|------------|
+| Private Blockchain | Permissioned blockchain with identified and authorized participants |
+| Public Blockchain | Open blockchain network where anyone can participate anonymously |
+| Scalability | Ability of a system to handle growing amounts of work or expand to accommodate that growth |
+| Smart Contract | Self-executing code that enforces agreements on the blockchain |
+| UTXO | Unspent Transaction Output data model used in some blockchains |
+| Layer 2 Solution | Protocol built on top of existing blockchain to improve scalability and efficiency |
+| Node | Any computer that connects to the blockchain network |
+| Oracle | Entity that connects blockchains to external, real-world data |
+| Gas | Computation cost metric used in Ethereum for executing operations |
+| Merkle Tree | Data structure used in blockchains for efficient verification of data integrity |
+:::
+
+::: notes
+This second set of definitions covers data models, architecture, and scalability concepts. The UTXO model (used in Hyperledger) and account-based model (used in Ethereum) represent different approaches to tracking state. Smart contracts, as tested extensively in the BLOCKBENCH framework, introduce significant overhead but enable complex blockchain applications. Layer 2 solutions emerge as a potential answer to the negative scalability issues identified by BLOCKBENCH. Understanding these terms provides context for the performance differences observed in the study and potential future directions for blockchain technology.
+:::
